@@ -1,76 +1,76 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct SinhVien {
-    char hoten[30];
-    int masv;
-    float d1, d2, d3;
+struct SinhVien{
+	char hoten[30];
+	int masv;
+	float diem1,diem2,diem3;
 };
 
-struct Node {
-    struct SinhVien data;
-    struct Node *link;
+struct Node{
+	struct SinhVien data;
+	struct Node *link;
 };
 
-struct LList {
-    struct Node *pHead;
-    struct Node *pTail;
-    int spt;
+struct LList{
+	struct Node *pHead;
+	struct Node *pTail;
+	int spt;
 };
 
-void initList(struct LList *L) {
-    L->pHead = NULL;
-    L->pTail = NULL;
-    L->spt = 0;
+void initList(struct LList *L){
+	L->pHead = NULL;
+	L->pTail = NULL;
+	L->spt = 0;
 }
 
-int emptyList(struct LList L) {
-    return L.spt == 0;
+int isEmpty(struct LList L){
+	return L.spt == 0;
 }
 
-void nhap(struct SinhVien *x) {
-    printf("Nhap ma sinh vien: ");
-    scanf("%d", &x->masv);
-    printf("Nhap ho ten: ");
-    scanf(" %[^\n]", x->hoten);
-    printf("Nhap diem mon 1: ");
-    scanf("%f", &x->d1);
-    printf("Nhap diem mon 2: ");
-    scanf("%f", &x->d2);
-    printf("Nhap diem mon 3: ");
-    scanf("%f", &x->d3);
+void Nhap(struct SinhVien *sv){
+	printf("Ho ten: ");
+    scanf(" %[^\n]", sv->hoten);
+    printf("Ma sinh vien: ");
+    scanf("%d", &sv->masv);
+    printf("Diem 1: ");
+    scanf("%f", &sv->diem1);
+    printf("Diem 2: ");
+    scanf("%f", &sv->diem2);
+    printf("Diem 3: ");
+    scanf("%f", &sv->diem3);
 }
 
-void in(struct SinhVien x) {
-     printf("Ten: %s, Ma: %d, Diem 1: %.2f, Diem 2: %.2f, Diem 2: %.2f\n", x.hoten, x.masv, x.d1, x.d2, x.d3);
+void Xuat(struct SinhVien sv){
+    printf("Ho ten: %s\tMa sv: %d\tDiem 1: %.2f\tDiem 2: %.2f\tDiem 3: %.2f\n",  sv.hoten, sv.masv, sv.diem1, sv.diem2, sv.diem3);
 }
 
-void insert_Head(struct LList *L, struct SinhVien x) {
+void insertHead(struct LList *L, struct SinhVien sv){
+	struct Node *pp;
+	pp = (struct Node*)malloc(sizeof(struct Node));
+	if(pp == NULL){
+		printf("Khong du bo nho");
+		return;
+	}
+	pp->data = sv;
+	pp->link = L->pHead;
+	if(isEmpty(*L)){
+		L->pTail = pp;
+	}
+	L->pHead = pp;
+	L->spt++;
+}
+
+void insertTail(struct LList *L, struct SinhVien sv) {
     struct Node *pp;
     pp = (struct Node*)malloc(sizeof(struct Node));
     if (pp == NULL) {
-        printf("Khong du bo nho!\n");
+        printf("Khong du bo nho");
         return;
     }
-    pp->data = x;
-    pp->link = L->pHead;
-    if (emptyList(*L)) {
-        L->pTail = pp;
-    }
-    L->pHead = pp;
-    L->spt++;
-}
-
-void insert_Tail(struct LList *L, struct SinhVien x) {
-    struct Node *pp;
-    pp = (struct Node*)malloc(sizeof(struct Node));
-    if (pp == NULL) {
-        printf("Khong du bo nho!\n");
-        return;
-    }
-    pp->data = x;
+    pp->data = sv;
     pp->link = NULL;
-    if (emptyList(*L)) {
+    if (isEmpty(*L)) {
         L->pHead = pp;
         L->pTail = pp;
     } else {
@@ -80,37 +80,39 @@ void insert_Tail(struct LList *L, struct SinhVien x) {
     L->spt++;
 }
 
-void insert_After(struct LList *L, int ma, struct SinhVien x) {
+struct Node *findNode(struct LList L, int ma) {
     struct Node *q = L->pHead;
-    while (q != NULL && q->data.masv != ma) {
-        q = q->link;
-    }
+    while (q != NULL && q->data.masv != ma){
+    	q = q->link;
+	}
+    return q;
+}
+
+void insertAfter(struct LList *L, int ma, struct SinhVien x) {
+    struct Node *q = findNode(*L, ma);
     if (q == NULL) {
         printf("Khong tim thay sinh vien!\n");
         return;
     }
     struct Node *pp = (struct Node*)malloc(sizeof(struct Node));
-    if (pp == NULL) {
-        printf("Khong du bo nho!\n");
-        return;
-    }
+    if (pp == NULL) return;
     pp->data = x;
     pp->link = q->link;
     q->link = pp;
-    if (q == L->pTail) {
-        L->pTail = pp;
-    }
+    if (q == L->pTail){
+    	L->pTail = pp;
+	}
     L->spt++;
 }
 
 void processList(struct LList L) {
     struct Node *pp = L.pHead;
-    if (emptyList(L)) {
+    if (isEmpty(L)) {
         printf("Danh sach rong!\n");
         return;
     }
     while (pp != NULL) {
-        in(pp->data);
+        Xuat(pp->data);
         pp = pp->link;
     }
 }
@@ -137,32 +139,43 @@ int main() {
         printf("1. Them vao dau danh sach\n");
         printf("2. Them vao cuoi danh sach\n");
         printf("3: Them vao sau mot nut khac\n");
+        printf("4: Tim kiem sinh vien\n");
         printf("9. Duyet danh sach\n");
         printf("0. Thoat\n");
         printf("Moi ban chon: ");
         scanf("%d", &chon);
         switch (chon) {
             case 1:
-                nhap(&x);
+                Nhap(&x);
                 if (x.masv > 0) {
-                    insert_Head(&L, x);
+                    insertHead(&L, x);
                 }
                 break;
             case 2:
-                nhap(&x);
+                Nhap(&x);
                 if (x.masv > 0) {
-                    insert_Tail(&L, x);
+                    insertTail(&L, x);
                 }
                 break;
             case 3:
                 printf("Nhap ma sinh vien can chen sau: ");
                 scanf("%d", &ma);
                 printf("Nhap thong tin sinh vien moi:\n");
-                nhap(&x);
+                Nhap(&x);
                 if (x.masv > 0) {
-                    insert_After(&L, ma, x);
+                    insertAfter(&L, ma, x);
                 }
                 break;
+            case 4:
+            	printf("Nhap ma sinh vien can tim: ");
+                scanf("%d", &ma);
+                struct Node *q = findNode(L, ma);
+				if (q == NULL) {
+					printf("Khong tim thay sinh vien!\n");
+					break;
+				}
+				Xuat(q->data);
+            	break;
             case 9:
                 processList(L);
                 break;
