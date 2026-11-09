@@ -81,7 +81,7 @@ void insertTail(struct LList *L, struct SinhVien sv) {
 }
 
 struct Node *findNode(struct LList L, int ma) {
-    struct Node *q = L->pHead;
+    struct Node *q = L.pHead;
     while (q != NULL && q->data.masv != ma){
     	q = q->link;
 	}
@@ -166,16 +166,20 @@ int main() {
                     insertAfter(&L, ma, x);
                 }
                 break;
-            case 4:
-            	printf("Nhap ma sinh vien can tim: ");
-                scanf("%d", &ma);
-                struct Node *q = findNode(L, ma);
-				if (q == NULL) {
-					printf("Khong tim thay sinh vien!\n");
-					break;
-				}
-				Xuat(q->data);
-            	break;
+            case 4: {
+			    printf("Nhap ma sinh vien can tim: ");
+			    scanf("%d", &ma);
+			
+			    struct Node *q = findNode(L, ma);
+			
+			    if (q == NULL) {
+			        printf("Khong tim thay sinh vien!\n");
+			        break;
+			    }
+			
+			    Xuat(q->data);
+			    break;
+			}
             case 9:
                 processList(L);
                 break;
