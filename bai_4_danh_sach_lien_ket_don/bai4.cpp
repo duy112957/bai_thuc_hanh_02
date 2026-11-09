@@ -105,6 +105,30 @@ void insertAfter(struct LList *L, int ma, struct SinhVien x) {
     L->spt++;
 }
 
+void deleteNode(struct LList *L, int ma) {
+    struct Node *q = L->pHead;
+    struct Node *prev = NULL;
+    while (q != NULL && q->data.masv != ma) {
+        prev = q;
+        q = q->link;
+    }
+    if (q == NULL) {
+        printf("Khong tim thay sinh vien can xoa!\n");
+        return;
+    }
+    if (prev == NULL) {
+        L->pHead = q->link;
+    } else {
+        prev->link = q->link;
+    }
+    if (q == L->pTail) {
+        L->pTail = prev;
+    }
+    free(q);
+    L->spt--;
+    printf("Xoa sinh vien thanh cong!\n");
+}
+
 void processList(struct LList L) {
     struct Node *pp = L.pHead;
     if (isEmpty(L)) {
@@ -140,6 +164,7 @@ int main() {
         printf("2. Them vao cuoi danh sach\n");
         printf("3: Them vao sau mot nut khac\n");
         printf("4: Tim kiem sinh vien\n");
+        printf("5. Xoa sinh vien theo ma\n");
         printf("9. Duyet danh sach\n");
         printf("0. Thoat\n");
         printf("Moi ban chon: ");
@@ -169,17 +194,19 @@ int main() {
             case 4: {
 			    printf("Nhap ma sinh vien can tim: ");
 			    scanf("%d", &ma);
-			
 			    struct Node *q = findNode(L, ma);
-			
 			    if (q == NULL) {
 			        printf("Khong tim thay sinh vien!\n");
 			        break;
 			    }
-			
 			    Xuat(q->data);
 			    break;
 			}
+			case 5:
+			    printf("Nhap ma sinh vien can xoa: ");
+			    scanf("%d", &ma);
+			    deleteNode(&L, ma);
+		    	break;
             case 9:
                 processList(L);
                 break;
