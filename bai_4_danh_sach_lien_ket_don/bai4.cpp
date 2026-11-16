@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 struct SinhVien{
 	char hoten[30];
 	int masv;
@@ -18,14 +18,14 @@ struct LList{
 	int spt;
 };
 
+int isEmpty(struct LList l){
+	return l.spt == 0;
+}
+
 void initList(struct LList *L){
 	L->pHead = NULL;
 	L->pTail = NULL;
 	L->spt = 0;
-}
-
-int isEmpty(struct LList L){
-	return L.spt == 0;
 }
 
 void Nhap(struct SinhVien *sv){
@@ -45,11 +45,11 @@ void Xuat(struct SinhVien sv){
     printf("Ho ten: %s\tMa sv: %d\tDiem 1: %.2f\tDiem 2: %.2f\tDiem 3: %.2f\n",  sv.hoten, sv.masv, sv.diem1, sv.diem2, sv.diem3);
 }
 
-void insertHead(struct LList *L, struct SinhVien sv){
+void insertHead(struct LList *L,struct SinhVien sv){
 	struct Node *pp;
 	pp = (struct Node*)malloc(sizeof(struct Node));
 	if(pp == NULL){
-		printf("Khong du bo nho");
+		printf("khong du bo nho");
 		return;
 	}
 	pp->data = sv;
@@ -61,72 +61,98 @@ void insertHead(struct LList *L, struct SinhVien sv){
 	L->spt++;
 }
 
-void insertTail(struct LList *L, struct SinhVien sv) {
-    struct Node *pp;
-    pp = (struct Node*)malloc(sizeof(struct Node));
-    if (pp == NULL) {
-        printf("Khong du bo nho");
-        return;
-    }
-    pp->data = sv;
-    pp->link = NULL;
-    if (isEmpty(*L)) {
-        L->pHead = pp;
-        L->pTail = pp;
-    } else {
-        L->pTail->link = pp;
-        L->pTail = pp;
-    }
-    L->spt++;
-}
-
-struct Node *findNode(struct LList L, int ma) {
-    struct Node *q = L.pHead;
-    while (q != NULL && q->data.masv != ma){
-    	q = q->link;
+void insertTail(struct LList *L,struct SinhVien sv){
+	struct Node *pp;
+	pp = (struct Node*)malloc(sizeof(struct Node));
+	if(pp == NULL){
+		printf("khong du bo nho");
+		return;
 	}
-    return q;
-}
-
-void insertAfter(struct LList *L, int ma, struct SinhVien x) {
-    struct Node *q = findNode(*L, ma);
-    if (q == NULL) {
-        printf("Khong tim thay sinh vien!\n");
-        return;
-    }
-    struct Node *pp = (struct Node*)malloc(sizeof(struct Node));
-    if (pp == NULL) return;
-    pp->data = x;
-    pp->link = q->link;
-    q->link = pp;
-    if (q == L->pTail){
-    	L->pTail = pp;
+	pp->data = sv;
+	pp->link = L->pTail;
+	if(isEmpty(*L)){
+		L->pHead = pp;
+		L->pTail = pp;
+	}else{
+		L->pTail->link = pp;
+		L->pTail = pp;
 	}
-    L->spt++;
+	L->spt++;
 }
 
-void deleteNode(struct LList *L, int ma) {
-    struct Node *q = L->pHead;
-    struct Node *prev = NULL;
-    while (q != NULL && q->data.masv != ma) {
-        prev = q;
-        q = q->link;
+struct Node* findNode(struct LList L, int ma){
+	struct Node* pp = L.pHead;
+	while(pp != NULL && pp->data.masv != ma){
+		pp = pp->link;
+	}
+	return pp;
+}
+
+void insertAfter(struct LList *L, struct SinhVien sv, int msv){
+	struct Node *q = findNode(*L,msv);
+	if(q == NULL){
+		printf("Khong tim thay sinh vien");
+		return;
+	}
+	struct Node *pp = (struct Node*)malloc(sizeof(struct Node));
+	if(pp == NULL){
+		printf("Khong du bo nho");
+		return;
+	}
+	pp->data = sv;
+	pp->link = q->link;
+	q->link = pp;
+	if(q == L->pTail){
+		L->pTail = pp;
+	}
+	L->spt++;
+}
+
+void deleteNode(struct LList *L, int msv){
+	struct Node* q = L->pHead;
+	struct Node* prev = NULL;
+	while(q != NULL && q->data.masv != msv){
+		prev = q;
+		q = q->link;
+	}
+	if(q == NULL){
+		printf("Khong tim thay sinh vien");
+		return;
+	}
+	if(prev == NULL){
+		L->pHead = q;
+	}else{
+		prev->link = q->link;
+	}
+	if(q == L->pTail){
+		L->pTail = prev;
+	}
+	free(q);
+	L->spt--;
+}
+
+void deleteNode(struct LList *L, char hoten[]){
+    struct Node* q = L->pHead;
+    struct Node* prev = NULL;
+    while(q != NULL){
+        if(strcmp(q->data.hoten, hoten) == 0){
+            struct Node* temp = q;
+            if(prev == NULL){
+                L->pHead = q->link;
+            }else{
+                prev->link = q->link;
+            }
+            if(q == L->pTail){
+                L->pTail = prev;
+            }
+            q = q->link;
+            free(temp);
+            L->spt--;
+        }else{
+            prev = q;
+            q = q->link;
+        }
     }
-    if (q == NULL) {
-        printf("Khong tim thay sinh vien can xoa!\n");
-        return;
-    }
-    if (prev == NULL) {
-        L->pHead = q->link;
-    } else {
-        prev->link = q->link;
-    }
-    if (q == L->pTail) {
-        L->pTail = prev;
-    }
-    free(q);
-    L->spt--;
-    printf("Xoa sinh vien thanh cong!\n");
 }
 
 void processList(struct LList L) {
@@ -152,20 +178,89 @@ void freeList(struct LList *L) {
     L->spt = 0;
 }
 
+void swap(struct SinhVien *a, struct SinhVien *b){
+    struct SinhVien temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void sortByName(struct LList *L){
+	struct Node *p, *q;
+    for(p = L->pHead; p != NULL; p = p->link){
+        for(q = p->link; q != NULL; q = q->link){
+            if(strcmp(p->data.hoten, q->data.hoten) > 0){
+                swap(&p->data, &q->data);
+            }
+        }
+    }
+}
+
+void sortByMa(struct LList *L){
+	struct Node *p, *q;
+    for(p = L->pHead; p != NULL; p = p->link){
+        for(q = p->link; q != NULL; q = q->link){
+            if(p->data.masv > q->data.masv){
+                swap(&p->data, &q->data);
+            }
+        }
+    }
+}
+
+void tachDanhSach(struct LList *L, struct LList *L1, struct LList *L2){
+	struct Node *pp = L->pHead;
+	int spt1 = L->spt / 2;
+	while(pp != NULL){
+		if(spt1 > 0){
+			spt1--;
+			insertTail(L1,pp->data);
+		}else{
+			insertTail(L2,pp->data);
+		}
+		pp = pp->link;
+	}
+}
+
+void ghepDanhSach(struct LList *L1,struct LList *L2){
+	if(isEmpty(*L2)) {
+		return;
+	}
+    if(isEmpty(*L1)){
+        L1->pHead = L2->pHead;
+        L1->pTail = L2->pTail;
+    }else{
+        L1->pTail->link = L2->pHead;
+        L1->pTail = L2->pTail;
+    }
+    L1->spt += L2->spt;
+    L2->pHead = NULL;
+    L2->pTail = NULL;
+    L2->spt = 0;
+}
+
 int main() {
     struct LList L;
     struct SinhVien x;
     int chon;
     int ma;
+    char hoten[30];
     initList(&L);
+    initList(&L1);
+	initList(&L2);
+    struct LList L1,L2;
     do {
         printf("\n===== QUAN LY SINH VIEN =====\n");
         printf("1. Them vao dau danh sach\n");
         printf("2. Them vao cuoi danh sach\n");
         printf("3: Them vao sau mot nut khac\n");
-        printf("4: Tim kiem sinh vien\n");
-        printf("5. Xoa sinh vien theo ma\n");
-        printf("9. Duyet danh sach\n");
+        printf("4: Tim kiem sinh vien theo ma sinh vien\n");
+        printf("5: Tim kiem sinh vien theo ten sinh vien\n");
+        printf("6. Xoa sinh vien theo ma\n");
+        printf("7. Xoa sinh vien theo ten\n");
+        printf("8. Sap xep theo ten\n");
+        printf("9. Sap xep theo ma sinh vien\n");
+        printf("10. Tach danh sach\n");
+        printf("11. Ghep danh sach\n");
+        printf("12. Duyet danh sach\n");
         printf("0. Thoat\n");
         printf("Moi ban chon: ");
         scanf("%d", &chon);
@@ -188,7 +283,7 @@ int main() {
                 printf("Nhap thong tin sinh vien moi:\n");
                 Nhap(&x);
                 if (x.masv > 0) {
-                    insertAfter(&L, ma, x);
+                    insertAfter(&L, x, ma);
                 }
                 break;
             case 4: {
@@ -202,12 +297,48 @@ int main() {
 			    Xuat(q->data);
 			    break;
 			}
-			case 5:
+			case 5: {
+			    printf("Nhap ten sinh vien can tim: ");
+			    scanf("%[^\n]", hoten);
+			    struct Node* pp = L.pHead;
+				while(pp != NULL){
+					if(strcmp(pp->data.hoten,hoten) == 0){
+						Xuat(pp->data);
+					}
+					pp = pp->link;
+				}
+			    break;
+			}
+			case 6:
 			    printf("Nhap ma sinh vien can xoa: ");
 			    scanf("%d", &ma);
 			    deleteNode(&L, ma);
 		    	break;
-            case 9:
+	    	case 7: {
+			   	printf("Nhap ho ten sinh vien can xoa: ");
+			    scanf(" %[^\n]", hoten);
+			    deleteNode(&L, hoten);
+			    break;
+			}
+			case 8:
+				sortByName(&L);
+				break;
+			case 9:
+				sortByMa(&L);
+				break;
+			case 10:
+				tachDanhSach(&L,&L1,&L2);
+				printf("Da tach thanh 2 danh sach\nDanh sach 1:\n");
+				processList(L1);
+				printf("Danh sach 2:\n");
+				processList(L2);
+				break;
+			case 11:
+				ghepDanhSach(*L1,&L2);
+				printf("Da ghep thanh 1 danh sach\n");
+				processList(L1);
+				break;
+            case 12:
                 processList(L);
                 break;
             case 0:
@@ -219,5 +350,7 @@ int main() {
 
     } while (chon != 0);
     freeList(&L);
+    freeList(&L1);
+    freeList(&L2);
     return 0;
 }
