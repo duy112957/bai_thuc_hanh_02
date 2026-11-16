@@ -120,7 +120,7 @@ void deleteNode(struct LList *L, int msv){
 		return;
 	}
 	if(prev == NULL){
-		L->pHead = q;
+		L->pHead = q->link;
 	}else{
 		prev->link = q->link;
 	}
