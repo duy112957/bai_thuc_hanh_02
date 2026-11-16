@@ -131,7 +131,7 @@ void deleteNode(struct LList *L, int msv){
 	L->spt--;
 }
 
-void deleteNode(struct LList *L, char hoten[]){
+void deleteNodeByName(struct LList *L, char hoten[]){
     struct Node* q = L->pHead;
     struct Node* prev = NULL;
     while(q != NULL){
@@ -207,6 +207,8 @@ void sortByMa(struct LList *L){
 }
 
 void tachDanhSach(struct LList *L, struct LList *L1, struct LList *L2){
+	freeList(L1);
+    freeList(L2);
 	struct Node *pp = L->pHead;
 	int spt1 = L->spt / 2;
 	while(pp != NULL){
@@ -238,7 +240,7 @@ void ghepDanhSach(struct LList *L1,struct LList *L2){
 }
 
 int main() {
-    struct LList L;
+    struct LList L,L1,L2;
     struct SinhVien x;
     int chon;
     int ma;
@@ -246,7 +248,6 @@ int main() {
     initList(&L);
     initList(&L1);
 	initList(&L2);
-    struct LList L1,L2;
     do {
         printf("\n===== QUAN LY SINH VIEN =====\n");
         printf("1. Them vao dau danh sach\n");
@@ -299,6 +300,7 @@ int main() {
 			}
 			case 5: {
 			    printf("Nhap ten sinh vien can tim: ");
+			    getchar();
 			    scanf("%[^\n]", hoten);
 			    struct Node* pp = L.pHead;
 				while(pp != NULL){
@@ -317,7 +319,7 @@ int main() {
 	    	case 7: {
 			   	printf("Nhap ho ten sinh vien can xoa: ");
 			    scanf(" %[^\n]", hoten);
-			    deleteNode(&L, hoten);
+			    deleteNodeByName(&L, hoten);
 			    break;
 			}
 			case 8:
@@ -334,7 +336,7 @@ int main() {
 				processList(L2);
 				break;
 			case 11:
-				ghepDanhSach(*L1,&L2);
+				ghepDanhSach(&L1,&L2);
 				printf("Da ghep thanh 1 danh sach\n");
 				processList(L1);
 				break;
